@@ -95,7 +95,7 @@ if diagnostic_file:
 
                         st.subheader("📘 Post-Test Summary")
                         post_counts = df['Post_Segment'].value_counts().reindex(SEGMENT_LABELS, fill_value=0)
-                        fig2, ax2 = plt.subplots(figsize=(6, 4))
+                        fig2, ax2 = plt.subplots(figsize=(3, 2))
                         ax2.bar(post_counts.index, post_counts.values, color=[SEGMENTS[seg]['color'] for seg in SEGMENT_LABELS])
                         ax2.set_ylabel("Number of Students", fontsize=12)
                         ax2.set_title("Post-Test Segment Distribution", fontsize=12)
@@ -110,7 +110,7 @@ if diagnostic_file:
                         })
                         compare_df.index.name = "Segment"
                         compare_df = compare_df.loc[SEGMENT_LABELS]
-                        fig3, ax3 = plt.subplots(figsize=(4, 2.5))
+                        fig3, ax3 = plt.subplots(figsize=(2, 1.25))
                         compare_df.plot(kind='bar', color=['gray', 'black'], ax=ax3)
                         ax3.set_ylabel("Number of Students", fontsize=12)
                         ax3.set_title("Comparison: Diagnostic vs Post-Test", fontsize=12)

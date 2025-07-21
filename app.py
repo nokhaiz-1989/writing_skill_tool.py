@@ -58,12 +58,13 @@ if diagnostic_file:
 
                 st.subheader("📊 Diagnostic Segment Summary")
                 diag_counts = df['Segment'].value_counts().reindex(SEGMENT_LABELS, fill_value=0)
-                fig, ax = plt.subplots(figsize=(10, 5))
+                fig, ax = plt.subplots(figsize=(8, 3))
                 ax.bar(diag_counts.index, diag_counts.values, color=[SEGMENTS[seg]['color'] for seg in SEGMENT_LABELS])
                 ax.set_ylabel("Number of Students", fontsize=14)
                 ax.set_title("Diagnostic Segment Distribution", fontsize=14)
-                ax.tick_params(axis='x', labelsize=10)
-                ax.tick_params(axis='y', labelsize=10)
+                ax.tick_params(axis='x', labelsize=8)
+                ax.tick_params(axis='y', labelsize=8)
+                plt.tight_layout()
                 st.pyplot(fig)
 
                 # Activity Upload
@@ -95,12 +96,13 @@ if diagnostic_file:
 
                         st.subheader("📘 Post-Test Summary")
                         post_counts = df['Post_Segment'].value_counts().reindex(SEGMENT_LABELS, fill_value=0)
-                        fig2, ax2 = plt.subplots(figsize=(10, 5))
+                        fig2, ax2 = plt.subplots(figsize=(8, 3))
                         ax2.bar(post_counts.index, post_counts.values, color=[SEGMENTS[seg]['color'] for seg in SEGMENT_LABELS])
                         ax2.set_ylabel("Number of Students", fontsize=14)
                         ax2.set_title("Post-Test Segment Distribution", fontsize=14)
-                        ax2.tick_params(axis='x', labelsize=10)
-                        ax2.tick_params(axis='y', labelsize=10)
+                        ax2.tick_params(axis='x', labelsize=8)
+                        ax2.tick_params(axis='y', labelsize=8)
+                        plt.tight_layout()
                         st.pyplot(fig2)
 
                         st.header("📈 Step 4: Comparative Visualization")
@@ -110,12 +112,13 @@ if diagnostic_file:
                         })
                         compare_df.index.name = "Segment"
                         compare_df = compare_df.loc[SEGMENT_LABELS]
-                        fig3, ax3 = plt.subplots(figsize=(10, 5))
+                        fig3, ax3 = plt.subplots(figsize=(8, 3))
                         compare_df.plot(kind='bar', color=['gray', 'black'], ax=ax3)
                         ax3.set_ylabel("Number of Students", fontsize=14)
                         ax3.set_title("Comparison: Diagnostic vs Post-Test", fontsize=14)
-                        ax3.tick_params(axis='x', labelsize=10)
-                        ax3.tick_params(axis='y', labelsize=10)
+                        ax3.tick_params(axis='x', labelsize=8)
+                        ax3.tick_params(axis='y', labelsize=8)
+                        plt.tight_layout()
                         st.pyplot(fig3)
 
                         st.subheader("📉 Activity-wise Segment Counts")
@@ -128,18 +131,21 @@ if diagnostic_file:
                                 act_summary['Minimal'].append(0)
                                 act_summary['Exemplary'].append(0)
                         act_df = pd.DataFrame(act_summary, index=[f'Activity_{i}' for i in range(1, 10)])
-                        fig4, ax4 = plt.subplots(figsize=(10, 5))
+                        fig4, ax4 = plt.subplots(figsize=(8, 3))
                         act_df.plot(kind='line', ax=ax4)
                         ax4.set_ylabel("Number of Students", fontsize=14)
                         ax4.set_title("Activity-wise Segment Counts", fontsize=14)
-                        ax4.tick_params(axis='x', labelsize=10)
-                        ax4.tick_params(axis='y', labelsize=10)
+                        ax4.tick_params(axis='x', labelsize=8)
+                        ax4.tick_params(axis='y', labelsize=8)
+                        plt.tight_layout()
                         st.pyplot(fig4)
 
                         st.subheader("🔥 Student Segment Shifts: Diagnostic → Post-Test")
                         shift_matrix = pd.crosstab(df['Segment'], df['Post_Segment'])
-                        fig5, ax5 = plt.subplots(figsize=(10, 5))
-                        sns.heatmap(shift_matrix, annot=True, fmt='d', cmap="YlGnBu", ax=ax5)
+                        shift_colors = [[SEGMENTS.get(col, {'color': '#FFFFFF'})['color'] for col in shift_matrix.columns] for _ in shift_matrix.index]
+                        fig5, ax5 = plt.subplots(figsize=(8, 3))
+                        sns.heatmap(shift_matrix, annot=True, fmt='d', cmap=sns.color_palette([SEGMENTS[s]['color'] for s in SEGMENT_LABELS]), cbar=False, ax=ax5)
+                        plt.tight_layout()
                         st.pyplot(fig5)
 
                         st.download_button(

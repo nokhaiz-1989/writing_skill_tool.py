@@ -142,9 +142,10 @@ if diagnostic_file:
 
                         st.subheader("🔥 Student Segment Shifts: Diagnostic → Post-Test")
                         shift_matrix = pd.crosstab(df['Segment'], df['Post_Segment'])
-                        shift_colors = [[SEGMENTS.get(col, {'color': '#FFFFFF'})['color'] for col in shift_matrix.columns] for _ in shift_matrix.index]
                         fig5, ax5 = plt.subplots(figsize=(8, 3))
-                        sns.heatmap(shift_matrix, annot=True, fmt='d', cmap=sns.color_palette([SEGMENTS[s]['color'] for s in SEGMENT_LABELS]), cbar=False, ax=ax5)
+                        cmap = sns.color_palette([SEGMENTS[s]['color'] for s in SEGMENT_LABELS])
+                        sns.heatmap(shift_matrix, annot=True, fmt='d', cbar=False, cmap=cmap, ax=ax5)
+                        ax5.set_title("Segment Shift Matrix", fontsize=12)
                         plt.tight_layout()
                         st.pyplot(fig5)
 

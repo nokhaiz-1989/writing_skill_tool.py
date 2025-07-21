@@ -110,7 +110,7 @@ if diagnostic_file:
                         })
                         compare_df.index.name = "Segment"
                         compare_df = compare_df.loc[SEGMENT_LABELS]
-                        fig3, ax3 = plt.subplots(figsize=(4, 2.5))
+                        fig3, ax3 = plt.subplots(figsize=(12, 8))
                         compare_df.plot(kind='bar', color=['gray', 'black'], ax=ax3)
                         ax3.set_ylabel("Number of Students", fontsize=12)
                         ax3.set_title("Comparison: Diagnostic vs Post-Test", fontsize=12)
@@ -128,13 +128,19 @@ if diagnostic_file:
                                 act_summary['Minimal'].append(0)
                                 act_summary['Exemplary'].append(0)
                         act_df = pd.DataFrame(act_summary, index=[f'Activity_{i}' for i in range(1, 10)])
-                        st.line_chart(act_df)
+                        fig4, ax4 = plt.subplots(figsize=(12, 8))
+                        act_df.plot(kind='line', ax=ax4)
+                        ax4.set_ylabel("Number of Students", fontsize=12)
+                        ax4.set_title("Activity-wise Segment Counts", fontsize=12)
+                        ax4.tick_params(axis='x', labelsize=12)
+                        ax4.tick_params(axis='y', labelsize=12)
+                        st.pyplot(fig4)
 
                         st.subheader("🔥 Student Segment Shifts: Diagnostic → Post-Test")
                         shift_matrix = pd.crosstab(df['Segment'], df['Post_Segment'])
-                        fig4, ax4 = plt.subplots(figsize=(7, 5))
-                        sns.heatmap(shift_matrix, annot=True, fmt='d', cmap="YlGnBu", ax=ax4)
-                        st.pyplot(fig4)
+                        fig5, ax5 = plt.subplots(figsize=(12, 8))
+                        sns.heatmap(shift_matrix, annot=True, fmt='d', cmap="YlGnBu", ax=ax5)
+                        st.pyplot(fig5)
 
                         st.download_button(
                             label="📥 Download Final Data as Excel",

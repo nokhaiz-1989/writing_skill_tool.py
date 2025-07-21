@@ -1,11 +1,12 @@
 import streamlit as st
 import pandas as pd
 
-# Set up Streamlit page config
-st.set_page_config(page_title="Student Score Analysis", layout="wide")
-st.title("📊 Student Score Analysis with Color-Coded Segmentation")
+# Page setup
+st.set_page_config(page_title="Student Score Segmentation", layout="centered")
+st.title("📘 Student Score Upload & Segmentation")
+st.write("Upload an Excel file with Student IDs and Scores.")
 
-# Color and Segment Mapping
+# Segment definition with color mapping
 SEGMENTS = {
     "Minimal": {"range": (0, 20), "color": "#FF0000"},           # Red
     "Needs Improvement": {"range": (21, 40), "color": "#FFA500"},# Orange
@@ -14,53 +15,41 @@ SEGMENTS = {
     "Exemplary": {"range": (81, 100), "color": "#00FF00"}        # Green
 }
 
-# Function to determine segment based on score
-def get_segment(score):
-    for segment, data in SEGMENTS.items():
-        low, high = data["range"]
-        if low <= score <= high:
+# Function to determine segment
+def assign_segment(score):
+    for segment, detail in SEGMENTS.items():
+        if detail["range"][0] <= score <= detail["range"][1]:
             return segment
     return "Invalid"
 
-# Upload Section
-st.subheader("📥 Upload Excel File")
-uploaded_file = st.file_uploader("Upload Excel file with columns: ID, Score", type=["xlsx"])
+# Upload file
+uploaded_file = st.file_uploader("📂 Upload Excel File (.xlsx)", type=["xlsx"])
 
 if uploaded_file:
     try:
-        # Read file
         df = pd.read_excel(uploaded_file)
 
-        # Strip and check columns
+        # Clean and validate columns
         df.columns = df.columns.str.strip()
         if 'ID' not in df.columns or 'Score' not in df.columns:
-            st.error("❌ The Excel file must contain 'ID' and 'Score' columns.")
+            st.error("❌ Excel must contain columns: 'ID' and 'Score'")
         else:
-            # Validate IDs and scores
-            valid_ids = df['ID'].apply(lambda x: str(x).startswith("STD-") and len(x) == 7)
-            valid_scores = df['Score'].apply(lambda x: isinstance(x, (int, float)) and 0 <= x <= 100)
+            # Validate ID format and score range
+            df['Valid_ID'] = df['ID'].apply(lambda x: isinstance(x, str) and x.startswith("STD-") and x[4:].isdigit())
+            df['Valid_Score'] = df['Score'].apply(lambda x: isinstance(x, (int, float)) and 0 <= x <= 100)
 
-            if not valid_ids.all():
-                st.warning("⚠️ Some IDs do not match the required format 'STD-001' to 'STD-100'.")
-            if not valid_scores.all():
-                st.warning("⚠️ Some scores are not valid integers between 0 and 100.")
+            if not df['Valid_ID'].all() or not df['Valid_Score'].all():
+                st.error("❌ Invalid ID format or score outside 0–100 range.")
+            else:
+                # Assign segments and colors
+                df['Segment'] = df['Score'].apply(assign_segment)
+                df['Color'] = df['Segment'].map(lambda seg: SEGMENTS[seg]['color'] if seg in SEGMENTS else "#FFFFFF")
 
-            if valid_ids.all() and valid_scores.all():
-                # Assign segments
-                df['Segment'] = df['Score'].apply(get_segment)
-                df['Color'] = df['Segment'].map(lambda x: SEGMENTS[x]['color'] if x in SEGMENTS else '#FFFFFF')
-
-                st.subheader("📋 Colored Student Segment Table")
-                st.dataframe(
-                    df.style.apply(
-                        lambda x: [f'background-color: {c}' for c in x['Color']], axis=1
-                    )
-                )
-
-                # Segment Summary
-                st.subheader("📈 Segment Count")
-                segment_counts = df['Segment'].value_counts().reindex(SEGMENTS.keys(), fill_value=0)
-                st.bar_chart(segment_counts)
+                # Display styled DataFrame
+                st.success("✅ GOOD WORK")
+                st.dataframe(df[['ID', 'Score', 'Segment']].style.apply(
+                    lambda row: [f"background-color: {df.at[row.name, 'Color']}"]*3, axis=1
+                ))
 
     except Exception as e:
-        st.error(f"❌ Failed to process file: {e}")
+        st.error(f"❌ Error reading file: {e}")

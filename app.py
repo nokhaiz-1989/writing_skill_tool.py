@@ -58,7 +58,7 @@ if diagnostic_file:
 
                 st.subheader("📊 Diagnostic Segment Summary")
                 diag_counts = df['Segment'].value_counts().reindex(SEGMENT_LABELS, fill_value=0)
-                fig, ax = plt.subplots(figsize=(3, 2))
+                fig, ax = plt.subplots(figsize=(6, 4))
                 ax.bar(diag_counts.index, diag_counts.values, color=[SEGMENTS[seg]['color'] for seg in SEGMENT_LABELS])
                 ax.set_ylabel("Number of Students", fontsize=12)
                 ax.set_title("Diagnostic Segment Distribution", fontsize=12)
@@ -95,7 +95,7 @@ if diagnostic_file:
 
                         st.subheader("📘 Post-Test Summary")
                         post_counts = df['Post_Segment'].value_counts().reindex(SEGMENT_LABELS, fill_value=0)
-                        fig2, ax2 = plt.subplots(figsize=(3, 2))
+                        fig2, ax2 = plt.subplots(figsize=(6, 4))
                         ax2.bar(post_counts.index, post_counts.values, color=[SEGMENTS[seg]['color'] for seg in SEGMENT_LABELS])
                         ax2.set_ylabel("Number of Students", fontsize=12)
                         ax2.set_title("Post-Test Segment Distribution", fontsize=12)

@@ -25,6 +25,13 @@ def assign_segment(score):
             return segment
     return "Invalid"
 
+# Function to convert DataFrame to Excel bytes
+def to_excel_bytes(df):
+    output = BytesIO()
+    with pd.ExcelWriter(output, engine='xlsxwriter') as writer:
+        df.to_excel(writer, index=False)
+    return output.getvalue()
+
 # Upload Diagnostic Test
 st.header("📥 Step 1: Upload Diagnostic Scores")
 diagnostic_file = st.file_uploader("Upload Excel file with columns: ID and Score", type=["xlsx"])
@@ -51,8 +58,8 @@ if diagnostic_file:
 
                 st.subheader("📊 Diagnostic Segment Summary")
                 diag_counts = df['Segment'].value_counts().reindex(SEGMENT_LABELS, fill_value=0)
-                fig, ax = plt.subplots()
-                bars = ax.bar(diag_counts.index, diag_counts.values, color=[SEGMENTS[seg]['color'] for seg in SEGMENT_LABELS])
+                fig, ax = plt.subplots(figsize=(4, 2.5))
+                ax.bar(diag_counts.index, diag_counts.values, color=[SEGMENTS[seg]['color'] for seg in SEGMENT_LABELS])
                 ax.set_ylabel("Number of Students")
                 ax.set_title("Diagnostic Segment Distribution")
                 st.pyplot(fig)
@@ -70,7 +77,6 @@ if diagnostic_file:
                             temp_df.rename(columns={'Score': f'Activity_{i}'}, inplace=True)
                             activity_scores.append(temp_df)
 
-                # Merge Activities with Main
                 for a_df in activity_scores:
                     df = pd.merge(df, a_df, on='ID', how='left')
 
@@ -85,16 +91,14 @@ if diagnostic_file:
                         df = pd.merge(df, post_df, on='ID', how='left')
                         df['Post_Segment'] = df['Post_Test'].apply(assign_segment)
 
-                        # Post Summary
                         st.subheader("📘 Post-Test Summary")
                         post_counts = df['Post_Segment'].value_counts().reindex(SEGMENT_LABELS, fill_value=0)
-                        fig2, ax2 = plt.subplots()
+                        fig2, ax2 = plt.subplots(figsize=(4, 2.5))
                         ax2.bar(post_counts.index, post_counts.values, color=[SEGMENTS[seg]['color'] for seg in SEGMENT_LABELS])
                         ax2.set_ylabel("Number of Students")
                         ax2.set_title("Post-Test Segment Distribution")
                         st.pyplot(fig2)
 
-                        # Comparison
                         st.header("📈 Step 4: Comparative Visualization")
                         compare_df = pd.DataFrame({
                             'Diagnostic': diag_counts,
@@ -102,13 +106,12 @@ if diagnostic_file:
                         })
                         compare_df.index.name = "Segment"
                         compare_df = compare_df.loc[SEGMENT_LABELS]
-                        fig3, ax3 = plt.subplots()
+                        fig3, ax3 = plt.subplots(figsize=(5, 3))
                         compare_df.plot(kind='bar', color=['gray', 'black'], ax=ax3)
                         ax3.set_ylabel("Number of Students")
                         ax3.set_title("Comparison: Diagnostic vs Post-Test")
                         st.pyplot(fig3)
 
-                        # Activity High/Low Bar Chart
                         st.subheader("📉 Activity-wise Segment Counts")
                         act_summary = {'Minimal': [], 'Exemplary': []}
                         for col in [f'Activity_{i}' for i in range(1, 10)]:
@@ -121,20 +124,18 @@ if diagnostic_file:
                         act_df = pd.DataFrame(act_summary, index=[f'Activity_{i}' for i in range(1, 10)])
                         st.line_chart(act_df)
 
-                        # Heatmap for Student Shift
                         st.subheader("🔥 Student Segment Shifts: Diagnostic → Post-Test")
                         shift_matrix = pd.crosstab(df['Segment'], df['Post_Segment'])
-                        fig4, ax4 = plt.subplots(figsize=(8, 6))
+                        fig4, ax4 = plt.subplots(figsize=(7, 5))
                         sns.heatmap(shift_matrix, annot=True, fmt='d', cmap="YlGnBu", ax=ax4)
                         st.pyplot(fig4)
 
-                        # Pie Chart of Segment Differences
-                        st.subheader("🧭 Segment Change Pie Chart")
-                        delta = post_counts - diag_counts
-                        fig5, ax5 = plt.subplots()
-                        ax5.pie(delta.values, labels=SEGMENT_LABELS, autopct="%1.1f%%", startangle=90, colors=[SEGMENTS[seg]['color'] for seg in SEGMENT_LABELS])
-                        ax5.set_title("Change in Segment Distribution")
-                        st.pyplot(fig5)
+                        st.download_button(
+                            label="📥 Download Final Data as Excel",
+                            data=to_excel_bytes(df),
+                            file_name="student_performance_summary.xlsx",
+                            mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+                        )
 
                         st.success("🎉 GOOD WORK")
 

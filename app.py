@@ -51,7 +51,11 @@ if diagnostic_file:
 
                 st.subheader("📊 Diagnostic Segment Summary")
                 diag_counts = df['Segment'].value_counts().reindex(SEGMENT_LABELS, fill_value=0)
-                st.bar_chart(diag_counts)
+                fig, ax = plt.subplots()
+                bars = ax.bar(diag_counts.index, diag_counts.values, color=[SEGMENTS[seg]['color'] for seg in SEGMENT_LABELS])
+                ax.set_ylabel("Number of Students")
+                ax.set_title("Diagnostic Segment Distribution")
+                st.pyplot(fig)
 
                 # Activity Upload
                 st.header("📘 Step 2: Upload Scores for 9 Activities")
@@ -84,7 +88,11 @@ if diagnostic_file:
                         # Post Summary
                         st.subheader("📘 Post-Test Summary")
                         post_counts = df['Post_Segment'].value_counts().reindex(SEGMENT_LABELS, fill_value=0)
-                        st.bar_chart(post_counts)
+                        fig2, ax2 = plt.subplots()
+                        ax2.bar(post_counts.index, post_counts.values, color=[SEGMENTS[seg]['color'] for seg in SEGMENT_LABELS])
+                        ax2.set_ylabel("Number of Students")
+                        ax2.set_title("Post-Test Segment Distribution")
+                        st.pyplot(fig2)
 
                         # Comparison
                         st.header("📈 Step 4: Comparative Visualization")
@@ -92,7 +100,13 @@ if diagnostic_file:
                             'Diagnostic': diag_counts,
                             'Post-Test': post_counts
                         })
-                        st.bar_chart(compare_df)
+                        compare_df.index.name = "Segment"
+                        compare_df = compare_df.loc[SEGMENT_LABELS]
+                        fig3, ax3 = plt.subplots()
+                        compare_df.plot(kind='bar', color=['gray', 'black'], ax=ax3)
+                        ax3.set_ylabel("Number of Students")
+                        ax3.set_title("Comparison: Diagnostic vs Post-Test")
+                        st.pyplot(fig3)
 
                         # Activity High/Low Bar Chart
                         st.subheader("📉 Activity-wise Segment Counts")
@@ -110,9 +124,17 @@ if diagnostic_file:
                         # Heatmap for Student Shift
                         st.subheader("🔥 Student Segment Shifts: Diagnostic → Post-Test")
                         shift_matrix = pd.crosstab(df['Segment'], df['Post_Segment'])
-                        fig, ax = plt.subplots(figsize=(8, 6))
-                        sns.heatmap(shift_matrix, annot=True, fmt='d', cmap="YlGnBu", ax=ax)
-                        st.pyplot(fig)
+                        fig4, ax4 = plt.subplots(figsize=(8, 6))
+                        sns.heatmap(shift_matrix, annot=True, fmt='d', cmap="YlGnBu", ax=ax4)
+                        st.pyplot(fig4)
+
+                        # Pie Chart of Segment Differences
+                        st.subheader("🧭 Segment Change Pie Chart")
+                        delta = post_counts - diag_counts
+                        fig5, ax5 = plt.subplots()
+                        ax5.pie(delta.values, labels=SEGMENT_LABELS, autopct="%1.1f%%", startangle=90, colors=[SEGMENTS[seg]['color'] for seg in SEGMENT_LABELS])
+                        ax5.set_title("Change in Segment Distribution")
+                        st.pyplot(fig5)
 
                         st.success("🎉 GOOD WORK")
 

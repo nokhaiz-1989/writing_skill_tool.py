@@ -58,10 +58,12 @@ if diagnostic_file:
 
                 st.subheader("📊 Diagnostic Segment Summary")
                 diag_counts = df['Segment'].value_counts().reindex(SEGMENT_LABELS, fill_value=0)
-                fig, ax = plt.subplots(figsize=(4, 2.5))
+                fig, ax = plt.subplots(figsize=(3, 2))
                 ax.bar(diag_counts.index, diag_counts.values, color=[SEGMENTS[seg]['color'] for seg in SEGMENT_LABELS])
-                ax.set_ylabel("Number of Students")
-                ax.set_title("Diagnostic Segment Distribution")
+                ax.set_ylabel("Number of Students", fontsize=12)
+                ax.set_title("Diagnostic Segment Distribution", fontsize=12)
+                ax.tick_params(axis='x', labelsize=12)
+                ax.tick_params(axis='y', labelsize=12)
                 st.pyplot(fig)
 
                 # Activity Upload
@@ -93,10 +95,12 @@ if diagnostic_file:
 
                         st.subheader("📘 Post-Test Summary")
                         post_counts = df['Post_Segment'].value_counts().reindex(SEGMENT_LABELS, fill_value=0)
-                        fig2, ax2 = plt.subplots(figsize=(4, 2.5))
+                        fig2, ax2 = plt.subplots(figsize=(3, 2))
                         ax2.bar(post_counts.index, post_counts.values, color=[SEGMENTS[seg]['color'] for seg in SEGMENT_LABELS])
-                        ax2.set_ylabel("Number of Students")
-                        ax2.set_title("Post-Test Segment Distribution")
+                        ax2.set_ylabel("Number of Students", fontsize=12)
+                        ax2.set_title("Post-Test Segment Distribution", fontsize=12)
+                        ax2.tick_params(axis='x', labelsize=12)
+                        ax2.tick_params(axis='y', labelsize=12)
                         st.pyplot(fig2)
 
                         st.header("📈 Step 4: Comparative Visualization")
@@ -106,10 +110,12 @@ if diagnostic_file:
                         })
                         compare_df.index.name = "Segment"
                         compare_df = compare_df.loc[SEGMENT_LABELS]
-                        fig3, ax3 = plt.subplots(figsize=(5, 3))
+                        fig3, ax3 = plt.subplots(figsize=(4, 2.5))
                         compare_df.plot(kind='bar', color=['gray', 'black'], ax=ax3)
-                        ax3.set_ylabel("Number of Students")
-                        ax3.set_title("Comparison: Diagnostic vs Post-Test")
+                        ax3.set_ylabel("Number of Students", fontsize=12)
+                        ax3.set_title("Comparison: Diagnostic vs Post-Test", fontsize=12)
+                        ax3.tick_params(axis='x', labelsize=12)
+                        ax3.tick_params(axis='y', labelsize=12)
                         st.pyplot(fig3)
 
                         st.subheader("📉 Activity-wise Segment Counts")
